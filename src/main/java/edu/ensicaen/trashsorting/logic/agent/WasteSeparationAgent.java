@@ -7,6 +7,7 @@ import edu.ensicaen.trashsorting.logic.EnvironmentEntity;
 import edu.ensicaen.trashsorting.logic.Waste;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -45,14 +46,17 @@ public class WasteSeparationAgent extends EnvironmentEntity {
 
     private void chooseDirection() {
         // randomizing direction + avoiding out of bound
-        velocityX_ = Environment.getInstance().generator_.nextDouble() - 0.5;
-        if (posX_ + velocityX_ <= 0 || posX_ + velocityX_ >= TrashSortingApplication.width) {
-            velocityX_ = -velocityX_;
+        Random random = new Random();
+        if (random.nextDouble() % 1 <= PROBABILITY_CHANGING_DIRECTION_) {
+            velocityX_ = Environment.getInstance().generator_.nextDouble() - 0.5;
+            velocityY_ = Environment.getInstance().generator_.nextDouble() - 0.5;
         }
-
-        velocityY_ = Environment.getInstance().generator_.nextDouble() - 0.5;
+        // avoiding out of bound
         if (posY_ + velocityY_ <= 0 || posY_ + velocityY_ >= TrashSortingApplication.height) {
             velocityY_ = -velocityY_;
+        }
+        if (posX_ + velocityX_ <= 0 || posX_ + velocityX_ >= TrashSortingApplication.width) {
+            velocityX_ = -velocityX_;
         }
     }
 
