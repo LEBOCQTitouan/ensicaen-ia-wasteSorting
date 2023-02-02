@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class Environment extends Observable {
     private static Environment instance_;
-
+    public static final int nbTypesOfWaste = 4;
     public Random generator_;
     protected double width_;
     protected double height_;
@@ -34,9 +34,7 @@ public class Environment extends Observable {
         return instance_;
     }
 
-    public void initialize(int nbWastes, int nbAgents,
-                           double width, double height,
-                           int nbTypesOfWaste) {
+    public void initialize(int nbWastes, int nbAgents, double width, double height, int nbTypesOfWaste) {
         width_ = width;
         height_ = height;
         wastes_.clear();

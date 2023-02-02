@@ -60,24 +60,24 @@ public class WasteSeparationAgent extends EnvironmentEntity {
         }
     }
 
-    public double getAvgProb(ArrayList<Waste> wastes) {
-        if (wastes.size() <= 6)
-            return 1;
-        double avg = 0;
-        for (Waste w: wastes) {
-            avg += w.probabilityToTake();
+    public boolean canPickUpColor(ArrayList<Waste> wastes, Waste w) {
+        // TODO cleaner code
+        int count = 0;
+        for (Waste waste : wastes) {
+            if (waste.type_ == w.type_) {
+                count++;
+                if (count > 1)
+                    return true;
+            }
         }
-        avg /= wastes.size();
-        return avg;
+        return count > 1;
     }
 
     public void makeActionNotBusy(ArrayList<Waste> wastes) {
-        double probTake = getAvgProb(wastes); // only pickup small
         for (Waste w : wastes) {
-            if (w.influenceArea() >= w.distanceTo(this) && w.probabilityToTake() >= probTake) {
+            if (w.influenceArea() >= w.distanceTo(this) && canPickUpColor(wastes, w)) {
                 busy_ = true;
-                waste_ = new Waste(w);
-                wastes.remove(w); // destroy waste (carried by agent)
+                waste_ = Environment.getInstance().pickUp(w);
                 return;
             }
         }
@@ -87,9 +87,7 @@ public class WasteSeparationAgent extends EnvironmentEntity {
     public void makeActionBusy(ArrayList<Waste> wastes) {
         for (Waste w : wastes) {
             if (w.influenceArea() >= w.distanceTo(this) && w.type_ == waste_.type_) {
-                for (int i = 0; i < waste_.getSize(); i++) {
-                    w.increaseSize();
-                }
+                Environment.getInstance().dropOff(w);
                 busy_ = false;
                 waste_ = null;
                 return;

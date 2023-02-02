@@ -16,7 +16,7 @@ import java.util.Timer;
  * Panel to display the simulation of waste separation.
  */
 public class WasteSeparationPanel extends JPanel implements Observer, MouseListener {
-    public static int refreshRate = 5;
+    public static int refreshRate = 1;
     public final static Color SADDLEBROWN = new Color(0.5450981f, 0.2705882f, 0.07450981f);
     public final static Color SANDYBROWN = new Color(0.9568627f, 0.643137276f,0.3764706f);
     public final static Color MEDIUMORCHID = new Color(0.7294118f, 0.33333334f, 0.827451f);
@@ -36,9 +36,7 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
 
     public void run() {
         environment_ = Environment.getInstance();
-        Random rand = new Random();
-        int pixels = TrashSortingApplication.height * TrashSortingApplication.height;
-        environment_.initialize(pixels / 1000, pixels / 10000, getWidth(), getHeight(), 3);
+        environment_.initialize(100, 100, getWidth(), getHeight(), Environment.nbTypesOfWaste);
         environment_.addObserver(this);
     }
 
@@ -80,14 +78,6 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
     public void update(Observable o, Object arg) {
         int agents = 0;
         repaint();
-        /*
-        for (WasteSeparationAgent agent : environment_.agents_) {
-            if (agent.isCarryingAWaste()) {
-                agents++;
-            }
-        }
-        System.out.println(environment_.wastes_.size() + " - " + agents);
-         */
     }
 
     public void drawAgent(WasteSeparationAgent agent, Graphics g) {
@@ -110,6 +100,9 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
                 break;
             case 2 :
                 color = ORANGERED;
+                break;
+            case 3:
+                color = YELLOWGREEN;
                 break;
             default :
                 color = OLIVEDRAB;
