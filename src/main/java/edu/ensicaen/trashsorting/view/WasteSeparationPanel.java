@@ -64,7 +64,6 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
         running_ = true;
         return;
     }
-
     @Override
     public void mousePressed(MouseEvent e) { }
     @Override
@@ -122,6 +121,31 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
                 area * 2);
     }
 
+    private int numberOfAgents() {
+        return environment_.agents_.size();
+    }
+
+    private int numberOfAgentsCarryingAWaste() {
+        int nb = 0;
+        for (WasteSeparationAgent agent: environment_.agents_) {
+            if (agent.isCarryingAWaste()) {
+                nb++;
+            }
+        }
+        return nb;
+    }
+
+    private int numberOfWastes() {
+        return environment_.wastes_.size();
+    }
+
+    public void drawStatistics(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.drawRect(0, 0, 200, 22);
+        g.drawString("Number of agents: " + numberOfAgents() + "(" + numberOfAgentsCarryingAWaste() + ")", 10, 11);
+        g.drawString("Number of wastes: " + numberOfWastes(), 10, 21);
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -131,5 +155,6 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
         for (Waste waste : environment_.wastes_) {
             drawWaste(waste, g);
         }
+        drawStatistics(g);
     }
 }

@@ -7,6 +7,7 @@ import edu.ensicaen.trashsorting.logic.EnvironmentEntity;
 import edu.ensicaen.trashsorting.logic.Waste;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
@@ -14,19 +15,19 @@ import java.util.UUID;
  * An agent that separates wastes.
  */
 public class WasteSeparationAgent extends EnvironmentEntity {
-    protected static final double INFLUENCE_DISTANCE_ = 3;
-    protected static final double PROBABILITY_CHANGING_DIRECTION_ = 0.05;
+
+    public static HashMap<Integer, Waste> depositPoints;
 
     protected Waste waste_;
     protected double velocityX_;
     protected double velocityY_;
-    protected boolean busy_ = false;
 
     private final String id;
 
-
     public WasteSeparationAgent(double posX, double posY) {
         id = UUID.randomUUID().toString();
+
+        depositPoints = new HashMap<>();
 
         posX_ = posX;
         posY_ = posY;
@@ -44,72 +45,76 @@ public class WasteSeparationAgent extends EnvironmentEntity {
         posY_ += velocityY_;
     }
 
-    private void chooseDirection() {
-        // randomizing direction + avoiding out of bound
-        Random random = new Random();
-        if (random.nextDouble() % 1 <= PROBABILITY_CHANGING_DIRECTION_) {
-            velocityX_ = Environment.getInstance().generator_.nextDouble() - 0.5;
-            velocityY_ = Environment.getInstance().generator_.nextDouble() - 0.5;
-        }
-        // avoiding out of bound
-        if (posY_ + velocityY_ <= 0 || posY_ + velocityY_ >= TrashSortingApplication.height) {
-            velocityY_ = -velocityY_;
-        }
-        if (posX_ + velocityX_ <= 0 || posX_ + velocityX_ >= TrashSortingApplication.width) {
-            velocityX_ = -velocityX_;
-        }
+    private void moveTowards(double x, double y) {
+        velocityX_ = x - posX_;
+        velocityY_ = y - posY_;
+        normalize();
     }
 
-    public boolean canPickUpColor(ArrayList<Waste> wastes, Waste w) {
-        // TODO cleaner code
-        int count = 0;
-        for (Waste waste : wastes) {
-            if (waste.type_ == w.type_) {
-                count++;
-                if (count > 1)
-                    return true;
+    private Waste findClosestWaste(ArrayList<Waste> wastes) {
+        Waste closestWaste = null;
+        double minDistance = Double.MAX_VALUE;
+        for (Waste w : wastes) {
+            if (!depositPoints.containsValue(w) && distanceTo(w) < minDistance) {
+                minDistance = distanceTo(w);
+                closestWaste = w;
             }
         }
-        return count > 1;
+        return closestWaste;
     }
 
     public void makeActionNotBusy(ArrayList<Waste> wastes) {
-        for (Waste w : wastes) {
-            if (w.influenceArea() >= w.distanceTo(this) && canPickUpColor(wastes, w)) {
-                busy_ = true;
-                waste_ = Environment.getInstance().pickUp(w);
-                return;
-            }
+        Waste closestWaste = findClosestWaste(wastes);
+        if (closestWaste == null) {
+            moveTowards(TrashSortingApplication.width/2,TrashSortingApplication.height/2);
+            return;
         }
-        return;
+        if (closestWaste.distanceTo(this) <= closestWaste.influenceArea()) {
+            waste_ = Environment.getInstance().pickUp(closestWaste);
+
+            makeActionBusy(wastes);
+            return;
+        }
+
+        moveTowards(closestWaste.posX_, closestWaste.posY_);
     }
 
     public void makeActionBusy(ArrayList<Waste> wastes) {
+        Waste depositPoint = depositPoints.get(waste_.getType());
+        if (depositPoint == null)
+            return;
+        if (depositPoint.distanceTo(this) <= depositPoint.influenceArea()) {
+            depositPoint.increaseSize();
+            waste_ = null;
+            return;
+        }
+        moveTowards(depositPoint.posX_, depositPoint.posY_);
+    }
+
+    private void updateDepositPoints(ArrayList<Waste> wastes) {
+        if (depositPoints.keySet().size() >= Environment.nbTypesOfWaste)
+            return;
+
         for (Waste w : wastes) {
-            if (w.influenceArea() >= w.distanceTo(this) && w.type_ == waste_.type_) {
-                Environment.getInstance().dropOff(w);
-                busy_ = false;
-                waste_ = null;
+            if (depositPoints.keySet().size() >= Environment.nbTypesOfWaste)
                 return;
+            if (!depositPoints.containsKey(w.getType())) {
+                depositPoints.put(w.getType(), w);
             }
         }
-        return;
     }
 
     public void makeAction(ArrayList<Waste> wastes) {
-        if (!busy_) {
-            makeActionNotBusy(wastes);
+        updateDepositPoints(wastes);
+        if (isCarryingAWaste()) {
+            makeActionBusy(wastes);
             return;
         }
-        makeActionBusy(wastes);
-        return;
+        makeActionNotBusy(wastes);
     }
 
     public void updateDirectionAndDecide(ArrayList<Waste> wastes) {
-        chooseDirection();
         makeAction(wastes);
-        normalize();
-        return;
     }
 
     protected void normalize() {
