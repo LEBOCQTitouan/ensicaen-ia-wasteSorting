@@ -19,8 +19,14 @@ Four types of waste are available:
 ### My implementation
 
 I have implemented a multi-agent system with a centralised architecture. All agent have access to the same environment
-and can communicate with each other. They stop picking up one type of waste when there is only one left on the map. It
-implicitly means that the agents are preparing the map to have four different deposit points.
+and can communicate with each other. At the start of the simulation, the environment is filled with waste of random
+sizes. The robots are randomly placed in the environment. The robots can move and sort the waste but only one unit by
+one unit.
+
+All non busy agent will move towards the nearest waste and pick it up.
+
+All busy agent will move towards the nearest sorting area (DepositPoint) and drop the waste. By default all drop point
+are located at the center of the environment.
 
 ## Installation
 

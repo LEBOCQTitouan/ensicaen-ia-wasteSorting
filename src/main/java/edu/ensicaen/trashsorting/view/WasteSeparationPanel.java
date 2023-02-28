@@ -149,11 +149,11 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (WasteSeparationAgent agent: environment_.agents_) {
-            drawAgent(agent, g);
-        }
         for (Waste waste : environment_.wastes_) {
             drawWaste(waste, g);
+        }
+        for (WasteSeparationAgent agent: environment_.agents_) {
+            drawAgent(agent, g);
         }
         drawStatistics(g);
     }

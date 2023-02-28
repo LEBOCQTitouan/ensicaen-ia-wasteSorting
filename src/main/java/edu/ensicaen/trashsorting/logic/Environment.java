@@ -38,8 +38,14 @@ public class Environment extends Observable {
         width_ = width;
         height_ = height;
         wastes_.clear();
+        Random generator = new Random();
         for (int i = 0; i < nbWastes; i++) {
-            Waste waste = new Waste(generator_.nextDouble() * width_,generator_.nextDouble() * height_, generator_.nextInt(nbTypesOfWaste));
+            Waste waste = new Waste(
+                    generator_.nextDouble() * width_,
+                    generator_.nextDouble() * height_,
+                    generator_.nextInt(nbTypesOfWaste),
+                    generator_.nextInt(3) + 1
+            );
             wastes_.add(waste);
         }
         agents_.clear();
@@ -58,9 +64,8 @@ public class Environment extends Observable {
         if (wastes_.contains(waste)) {
             waste.increaseSize();
             return;
-        } else {
-            wastes_.add(waste);
         }
+        wastes_.add(waste);
     }
 
     /**

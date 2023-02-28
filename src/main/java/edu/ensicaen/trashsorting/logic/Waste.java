@@ -12,12 +12,17 @@ public class Waste extends EnvironmentEntity {
 
     private String id;
 
-    public Waste(double _posX, double _posY, int _type) {
+    public Waste(double _posX, double _posY, int _type, int size_) {
         id = UUID.randomUUID().toString();
 
         type_ = _type;
         posX_ = _posX;
         posY_ = _posY;
+        this.size_ = size_;
+    }
+
+    public Waste(double _posX, double _posY, int _type) {
+        this(_posX, _posY, _type, 1);
     }
 
     public Waste(Waste waste) {
@@ -72,6 +77,6 @@ public class Waste extends EnvironmentEntity {
             return false;
         }
         Waste other = (Waste) obj;
-        return other.id.equals(this.id);
+        return other.id != null && other.id.equals(this.id);
     }
 }
