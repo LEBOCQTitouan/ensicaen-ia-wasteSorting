@@ -36,7 +36,7 @@ public class WasteSeparationPanel extends JPanel implements Observer, MouseListe
 
     public void run() {
         environment_ = Environment.getInstance();
-        environment_.initialize(100, 100, getWidth(), getHeight(), Environment.nbTypesOfWaste);
+        environment_.initialize(100, 5, getWidth(), getHeight(), Environment.nbTypesOfWaste);
         environment_.addObserver(this);
     }
 

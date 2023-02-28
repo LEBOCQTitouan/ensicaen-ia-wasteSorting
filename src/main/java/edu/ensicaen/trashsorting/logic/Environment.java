@@ -55,7 +55,12 @@ public class Environment extends Observable {
      * @param waste The waste to drop off.
      */
     public void dropOff(Waste waste) {
-        waste.increaseSize();
+        if (wastes_.contains(waste)) {
+            waste.increaseSize();
+            return;
+        } else {
+            wastes_.add(waste);
+        }
     }
 
     /**
@@ -89,13 +94,4 @@ public class Environment extends Observable {
         setChanged();
         notifyObservers();
     }
-
-    public double getWidth() {
-        return width_;
-    }
-
-    public double getHeight() {
-        return height_;
-    }
-
 }

@@ -59,4 +59,19 @@ public class Waste extends EnvironmentEntity {
                 ", posY_=" + posY_ +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Waste)) {
+            return false;
+        }
+        Waste other = (Waste) obj;
+        return other.id.equals(this.id);
+    }
 }
